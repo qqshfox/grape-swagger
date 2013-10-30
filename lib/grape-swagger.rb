@@ -131,7 +131,7 @@ module Grape
                 params.map do |param, value|
                   value[:type] = 'file' if value.is_a?(Hash) && value[:type] == 'Rack::Multipart::UploadedFile'
 
-                  dataType = value.is_a?(Hash) ? (value[:type] || 'String').to_s : 'String'
+                  dataType = data_type_from_value
                   description = value.is_a?(Hash) ? value[:desc] || value[:description] : ''
                   required = value.is_a?(Hash) ? !!value[:required] : false
                   paramType = path.include?(":#{param}") ? 'path' : (method == 'POST') ? 'form' : 'query'
@@ -147,6 +147,14 @@ module Grape
               else
                 []
               end
+            end
+
+            def data_type_from_value(value)
+              if value.is_a?(Hash)
+                return 'Boolean' if value[:type] == 'Virtus::Attribute::Boolean'
+                return (value[:type] || 'String').to_s
+              end
+              return 'String'
             end
 
 
