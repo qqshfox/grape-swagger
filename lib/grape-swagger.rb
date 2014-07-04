@@ -138,7 +138,7 @@ module Grape
               apis = []
 
               ops.each do |path, routes|
-                operations = routes.map do |route|
+                operations = routes.uniq { |route| route.route_method }.map do |route|
                   notes       = as_markdown(route.route_notes)
                   http_codes  = parse_http_codes(route.route_http_codes)
 
