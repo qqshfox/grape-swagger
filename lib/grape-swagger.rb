@@ -190,7 +190,7 @@ module Grape
               params.map do |param, value|
                 value[:type] = 'file' if value.is_a?(Hash) && value[:type] == 'Rack::Multipart::UploadedFile'
 
-                dataType    = value.is_a?(Hash) ? (value[:type] || 'String').to_s : 'String'
+                dataType    = data_type_from_value(value)
                 description = value.is_a?(Hash) ? value[:desc] || value[:description] : ''
                 required    = value.is_a?(Hash) ? !!value[:required] : false
                 defaultValue = value.is_a?(Hash) ? value[:defaultValue] : nil
@@ -214,6 +214,15 @@ module Grape
 
                 parsed_params
               end
+            end
+
+            def data_type_from_value(value)
+              if value.is_a?(Hash)
+                return 'Boolean' if value[:type] == 'Virtus::Attribute::Boolean'
+                return value.is_a?(Hash) ? (value[:type] || 'String').to_s : 'String'
+              end
+              # can't figure it out, return a default of string
+              return 'String'
             end
 
             def content_types_for(target_class)
